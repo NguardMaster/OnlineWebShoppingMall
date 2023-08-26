@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ShoppingMall</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
+    <!-- Bootstrap icons-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link
+      href="{{ url_for('static', filename='css/styles.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container px-lg-5">
+        <a class="navbar-brand" href="#!">ShoppingMall</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/shop"
+                >Shop</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin">Admin</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Header-->
+    <header class="py-5">
+      <div class="container px-lg-5">
+        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
+          <div class="m-4 m-lg-5">
+            <h1 class="display-5 fw-bold">상품 조회</h1>
+            <div class="row">
+              {% for item in data %}
+              <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                  <img
+                    src="{{ item[4] }}"
+                    class="card-img-top"
+                    alt="{{ item[1] }}"
+                    style="height : 220px"
+                  />
+                  <div class="card-body">
+                    <h2 class="card-title">{{ item[1] }}</h2>
+                    <br />
+                    <p class="card-text">가격: {{ item[2] }}원</p>
+                    <p class="card-text">수량: {{ item[3] }}개</p>
+                    <button class="btn btn-outline-primary">
+                      구매하기
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <br /><br /><br />
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="container px-lg-5">
+      <div class="mb-5">
+        <div class="bg-light border-0 h-100 shadow-l">
+          <div class="text-center p-4 p-lg-5 pt-0 pt-lg-0">
+            I love shopping!
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">
+          Copyright &copy; WonKyuNa 2023
+        </p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="static/js/scripts.js"></script>
+
+    <script></script>
+  </body>
+</html>
