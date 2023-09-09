@@ -67,7 +67,7 @@ def save_data():
     # 데이터를 DB에 저장
     save_data_to_db(name, price, count, filepath)
     # 필요한 경우 응답을 반환하거나 리디렉션을 수행
-    return render_template('contact.html')
+    return render_template('success.html')
 
 
 def get_data_from_db():

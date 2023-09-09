@@ -1,120 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>ShoppingMall</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
     <!-- Bootstrap icons-->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link
-      href="{{ url_for('static', filename='css/styles.css') }}"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
-    rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <!-- Custom CSS for styling -->
+    <style>
+        /* 배경 이미지 설정 */
+        body {
+            background-image: url('background_admin_login.jpg'); /* 배경 이미지 경로 설정 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+        }
+
+        /* 네비게이션 바 스타일 */
+        .navbar {
+            background-color: #343a40; /* 배경 색상 */
+        }
+
+        .navbar-brand {
+            color: white; /* 로고 텍스트 색상 */
+            font-size: 2rem; /* 로고 폰트 크기 */
+            font-weight: bold; /* 로고 폰트 굵기 */
+        }
+
+        .navbar-toggler-icon {
+            background-color: white; /* 햄버거 아이콘 색상 */
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important; /* 네비게이션 링크 텍스트 색상 (important 사용) */
+            font-size: 1.2rem; /* 네비게이션 링크 폰트 크기 */
+            margin-right: 20px; /* 링크 간격 조정 */
+            transition: color 0.3s; /* 링크 색상 전환 애니메이션 */
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #007bff !important; /* 링크에 호버 시 색상 변경 (important 사용) */
+        }
+
+        /* Header 스타일 */
+        .header-container {
+            background-color: rgba(0, 0, 0, 0.5); /* Header 배경 색상 및 투명도 조정 */
+            padding: 100px 0; /* Header 패딩 */
+            text-align: center;
+            color: white; /* Header 텍스트 색상 */
+        }
+
+        .header-container h1 {
+            font-size: 3rem; /* Header 제목 폰트 크기 */
+            font-weight: bold; /* Header 제목 굵기 */
+        }
+
+        .header-container p {
+            font-size: 1.5rem; /* Header 부제목 폰트 크기 */
+        }
+
+        /* 입력 폼 스타일 */
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.8); /* 입력 폼 배경 색상 및 투명도 조정 */
+            padding: 20px; /* 입력 폼 패딩 */
+            border-radius: 10px; /* 입력 폼 모서리 둥글게 */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .form-container label {
+            font-size: 1.2rem; /* 라벨 폰트 크기 */
+            color: black !important; /* 라벨 텍스트 색상 (important 사용) */
+        }
+
+        .form-container input[type="text"], .form-container input[type="file"] {
+            width: 100%; /* 입력 필드 너비 조정 */
+            padding: 10px; /* 입력 필드 패딩 */
+            margin-bottom: 20px; /* 입력 필드 간격 조정 */
+            border: 1px solid #ccc; /* 입력 필드 테두리 스타일 */
+            border-radius: 5px; /* 입력 필드 모서리 둥글게 */
+            color: black !important; /* 입력 필드 텍스트 색상 (important 사용) */
+        }
+
+        .form-container .btn-primary {
+            background-color: #007bff; /* 버튼 배경 색상 */
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem; /* 버튼 폰트 크기 */
+            border-radius: 30px; /* 버튼 모양 */
+            transition: background-color 0.3s; /* 버튼 배경 색상 전환 애니메이션 */
+        }
+
+        .form-container .btn-primary:hover {
+            background-color: #0056b3; /* 버튼에 호버 시 색상 변경 */
+        }
+
+        /* Footer 스타일 */
+        .footer {
+            background-color: #343a40; /* Footer 배경 색상 */
+            color: white !important; /* Footer 텍스트 색상 (important 사용) */
+            padding: 20px 0; /* Footer 패딩 */
+            text-align: center;
+        }
+
+        /* 오류 팝업 스타일 */
+        .error-popup {
+            display: none; /* 초기에 숨김 */
+            background-color: rgba(255, 0, 0, 0.8); /* 오류 팝업 배경 색상 및 투명도 조정 */
+            color: white; /* 오류 팝업 텍스트 색상 */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 9999; /* 다른 요소 위에 표시 */
+        }
+    </style>
 </head>
-  </head>
-  <body>
-    <!-- Responsive navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container px-lg-5">
+<body>
+<!-- Responsive navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container px-lg-5">
         <a class="navbar-brand" href="/">ShoppingMall</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/shop"
-                >Shop</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin">Admin</a>
-            </li>
-          </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/shop">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+            </ul>
         </div>
-      </div>
-    </nav>
-    <!-- Header-->
-    <header class="py-5">
-      <div class="container px-lg-5">
-        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
-          <div class="m-4 m-lg-5">
-            <h1 class="display-5 fw-bold">상품 등록</h1>
-            <br />
-            <form
-              action="/save_data"
-              method="post"
-              enctype="multipart/form-data"
-            >
-              <label for="dataInput1">상품:</label>
-              <input type="text" id="dataInput1" name="name" /><br /><br />
-              <label for="dataInput2">가격:</label>
-              <input type="text" id="dataInput2" name="price" /><br /><br />
-              <label for="dataInput3">수량:</label>
-              <input type="text" id="dataInput3" name="count" /><br /><br />
-              <input type="file" name="image" /><br /><br /><br />
-              <input class="btn btn-outline-primary" type="submit" value="상품 등록" />
-            </form>
-            <br /><br /><br />
-          </div>
-        </div>
-      </div>
-    </header>
-    <div class="container px-lg-5">
-      <div class="mb-5">
-        <div class="bg-light border-0 h-100 shadow-l">
-          <div class="text-center p-4 p-lg-5 pt-0 pt-lg-0">I love shopping!</div>
-        </div>
-      </div>
     </div>
-    <!-- Footer-->
-    <footer class="py-5 bg-dark">
-      <div class="container">
+</nav>
+<!-- Header -->
+<header class="py-5 header-container">
+    <div class="container px-lg-5">
+        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
+            <div class="m-4 m-lg-5">
+                <h1 class="display-5 fw-bold" style="color: black;">상품 등록</h1>
+                <div class="form-container">
+                    <form id="uploadForm" action="/save_data" method="post" enctype="multipart/form-data">
+                        <label for="dataInput1">상품:</label>
+                        <input type="text" id="dataInput1" name="name" />
+                        <br /><br />
+                        <label for="dataInput2">가격:</label>
+                        <input type="text" id="dataInput2" name="price" />
+                        <br /><br />
+                        <label for="dataInput3">수량:</label>
+                        <input type="text" id="dataInput3" name="count" />
+                        <br /><br />
+                        <input type="file" id="fileInput" name="image" />
+                        <br /><br /><br />
+                        <input class="btn btn-primary" type="submit" value="상품 등록" />
+                    </form>
+                </div>
+                <br /><br /><br />
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container px-lg-5">
+    <div class="mb-5">
+        <div class="bg-light border-0 h-100 shadow-l">
+            <div class="text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                I love shopping!
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<footer class="py-5 footer">
+    <div class="container">
         <p class="m-0 text-center text-white">
-          Copyright &copy; WonKyuNa 2023
+            Copyright &copy; WonKyuNa 2023
         </p>
-      </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- Bootstrap core JS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="static/js/scripts.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script></script>
-  </body>
+<!-- 오류 팝업 -->
+<div id="error" class="error-popup">
+    수량 또는 가격 또는 이미지에 잘못된 값이 포함되어 있습니다.
+
+<!-- Bootstrap core JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS -->
+<script src="static/js/scripts.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- JavaScript 코드 추가 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("uploadForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // 기본 제출 동작 막음
+
+            // 가격과 수량 입력값 가져오기
+            var priceInput = document.getElementById("dataInput2").value;
+            var countInput = document.getElementById("dataInput3").value;
+
+            // 숫자 형식인지 확인하는 정규식
+            var numberPattern = /^[0-9]+$/;
+
+            if (!priceInput.match(numberPattern) || !countInput.match(numberPattern)) {
+                // 숫자가 아닌 값이 입력된 경우 오류 팝업 표시
+                var errorPopup = document.getElementById("error");
+                errorPopup.style.display = "block";
+
+                // 오류 팝업을 자동으로 닫는 코드
+                setTimeout(function () {
+                    errorPopup.style.display = "none";
+                }, 3000); // 3초 후에 자동으로 닫힘
+            } else {
+                // 이미지 파일인 경우 서버로 제출
+                var fileInput = document.getElementById("fileInput");
+                var file = fileInput.files[0];
+
+                if (file) {
+                    if (file.type.match("image.*")) {
+                        // 이미지 파일인 경우 서버로 제출
+                        this.submit();
+                    } else {
+                        // 이미지 파일이 아닌 경우 오류 팝업 표시
+                        var errorPopup = document.getElementById("error");
+                        errorPopup.style.display = "block";
+
+                        // 오류 팝업을 자동으로 닫는 코드
+                        setTimeout(function () {
+                            errorPopup.style.display = "none";
+                        }, 3000); // 3초 후에 자동으로 닫힘
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
 </html>
