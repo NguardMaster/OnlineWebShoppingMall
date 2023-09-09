@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for the pretty button -->
+    <style>
+        .pretty-button {
+            background-color: #4CAF50; /* Green background color */
+            color: white; /* White text color */
+            border: none; /* No border */
+            padding: 10px 20px; /* Padding */
+            text-align: center; /* Center text */
+            text-decoration: none; /* No underlining */
+            display: inline-block; /* Display as inline block */
+            margin: 4px 2px; /* Margin between buttons */
+            cursor: pointer; /* Cursor pointer on hover */
+            border-radius: 8px; /* Rounded corners */
+            transition: background-color 0.3s ease; /* Smooth color transition */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .pretty-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Login</h1>
+    <form method="POST">
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit" class="pretty-button">로그인</button>
+    </form>
+    {% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+</body>
+</html>

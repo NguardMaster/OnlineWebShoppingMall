@@ -7,6 +7,7 @@ app.register_blueprint(test_module)
 DATABASE = 'maindata.db'
 UPLOAD_FOLDER = 'static/img_upload_folder'   # 이미지 업로드 폴더 경로로 변경해주세요
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config.from_pyfile('config.py')
 
 
 @app.teardown_appcontext
@@ -108,9 +109,21 @@ def about():
     print(data)
     return render_template('shop.html', data=data)
 
-@app.route("/admin")
-def contact():
-    return render_template('adminpanel.html')
+@app.route("/admin", methods=['GET', 'POST'])
+def adminpanel():
+    if request.method == 'POST':
+        # POST 요청을 처리하여 입력된 비밀번호를 확인
+        password_attempt = request.form.get('password')
+        if password_attempt == app.config['ADMIN_PASSWORD']:
+            # 비밀번호가 일치하는 경우, adminpanel.html 페이지로 이동
+            return render_template('adminpanel.html')
+        else:
+            # 비밀번호가 일치하지 않는 경우 에러 메시지를 표시
+            error_message = '비밀번호가 올바르지 않습니다.'
+            return render_template('admin_login.html', error_message=error_message)
+
+    # GET 요청인 경우, 로그인 폼을 표시
+    return render_template('admin_login.html')
 
 if __name__ == "__main__":              
     app.run(host="0.0.0.0", port="8081" ,debug=True)
