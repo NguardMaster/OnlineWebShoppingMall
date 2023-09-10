@@ -105,10 +105,10 @@
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
         }
 
-.purchase-button:hover {
-    background-color: #45a049; /* Darker green on hover */
-    transform: scale(1.05); /* Enlarge on hover */
-}
+        .purchase-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+            transform: scale(1.05); /* Enlarge on hover */
+        }
     </style>
 </head>
 <body>
@@ -175,7 +175,11 @@
                                               </div>
                                               <div class="modal-footer">
                                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
-                                                  <button type="button" class="btn btn-primary">확인</button>
+                                                  {% if item[3] == 0 %}
+                                                      <button type="button" class="btn btn-danger" disabled>재고 없음</button>
+                                                  {% else %}
+                                                      <button type="button" class="btn btn-primary">확인</button>
+                                                  {% endif %}
                                               </div>
                                           </div>
                                       </div>
