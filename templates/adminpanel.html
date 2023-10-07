@@ -125,6 +125,21 @@
             border-radius: 10px;
             z-index: 9999; /* 다른 요소 위에 표시 */
         }
+
+        .price-text {
+            color: black !important;
+            margin-top: 5px;
+            font-size: 1rem;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .form-container:hover .price-text {
+            opacity: 1;
+            transform: scale(1);
+        }
+
     </style>
 </head>
 <body>
@@ -253,5 +268,132 @@
         });
     });
 </script>
+<!-- JavaScript 코드 추가 -->
+<!-- JavaScript 코드 추가 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var priceInput = document.getElementById("dataInput2"); // 가격 입력란
+        var priceText = document.createElement("div"); // 텍스트로 변환된 가격을 표시할 div 엘리먼트 생성
+        priceInput.parentNode.appendChild(priceText); // 가격 입력란 바로 아래에 추가
+
+        // 가격 변환 함수
+        function formatPrice(price) {
+            if (price >= 100000000) {
+                return (price / 100000000).toFixed(0) + "억원";
+            } else if (price >= 10000000) {
+                return (price / 10000000).toFixed(0) + "천만원";
+            } else if (price >= 10000) {
+                return (price / 10000).toFixed(0) + "만원";
+            } else if (price >= 1000) {
+                return (price / 1000).toFixed(0) + "천원";
+            } else {
+                return price + "원";
+            }
+        }
+
+        // 가격 입력란 값이 변경될 때마다 호출되는 이벤트 핸들러
+        priceInput.addEventListener("input", function () {
+            var inputValue = parseInt(this.value.replace(/[^0-9]/g, ""), 10); // 숫자 이외의 문자 제거
+            if (!isNaN(inputValue)) {
+                priceText.innerHTML = formatPrice(inputValue); // 텍스트로 변환하여 업데이트
+            } else {
+                priceText.innerHTML = ""; // 숫자가 아닌 경우 텍스트 제거
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var priceInput = document.getElementById("dataInput2"); // 가격 입력란
+        var priceText = document.createElement("div"); // 텍스트로 변환된 가격을 표시할 div 엘리먼트 생성
+        priceInput.parentNode.appendChild(priceText); // 가격 입력란 바로 아래에 추가
+
+    function formatPrice(price) {
+        if (price >= 100000000) {
+            var eok = Math.floor(price / 100000000); // 억 단위
+            price %= 100000000;
+            var man = Math.floor(price / 10000); // 만 단위
+            price %= 10000;
+            var cheon = Math.floor(price / 1000); // 천 단위
+            price %= 1000;
+            var won = price; // 원 단위
+
+            var result = "";
+
+            if (eok > 0) {
+                result += eok + "억";
+            }
+
+            if (man > 0) {
+                if (result) {
+                    result += " ";
+                }
+                result += man + "만";
+            }
+
+            if (cheon > 0) {
+                if (result) {
+                    result += " ";
+                }
+                result += cheon + "천";
+            }
+
+            if (won > 0) {
+                if (result) {
+                    result += " ";
+                }
+                result += won;
+            }
+
+            return result + "원";
+        } else {
+            var result = "";
+
+            if (price >= 10000) {
+                var man = Math.floor(price / 10000); // 만 단위
+                price %= 10000;
+                if (man > 0) {
+                    result += man + "만";
+                }
+            }
+
+            if (price >= 1000) {
+                var cheon = Math.floor(price / 1000); // 천 단위
+                price %= 1000;
+                if (cheon > 0) {
+                    if (result) {
+                        result += " ";
+                    }
+                    result += cheon + "천";
+                }
+            }
+
+            if (price > 0) {
+                if (result) {
+                    result += " ";
+                }
+                result += price;
+            }
+
+            return result + "원";
+        }
+    }
+
+
+        // 가격 입력란 값이 변경될 때마다 호출되는 이벤트 핸들러
+        priceInput.addEventListener("input", function () {
+            var inputValue = parseInt(this.value.replace(/[^0-9]/g, ""), 10); // 숫자 이외의 문자 제거
+            if (!isNaN(inputValue)) {
+                var formattedPrice = formatPrice(inputValue); // 텍스트로 변환된 가격을 가져옴
+                priceText.innerHTML = formattedPrice; // 텍스트로 변환된 가격으로 업데이트
+                priceText.style.color = "black"; // 텍스트 색상을 검정색으로 설정
+            } else {
+                priceText.innerHTML = ""; // 숫자가 아닌 경우 텍스트 제거
+            }
+        });
+    });
+</script>
+<!-- JavaScript 코드 추가 -->
 </body>
 </html>
+

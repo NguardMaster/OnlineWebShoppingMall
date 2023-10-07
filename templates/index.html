@@ -29,12 +29,15 @@
         /* 네비게이션 바 스타일 */
         .navbar {
             background-color: #343a40; /* 배경 색상 */
+            flex-direction: column; /* Flexbox 컬럼 방향 설정 */
+            align-items: flex-start; /* 왼쪽 정렬 */
         }
 
         .navbar-brand {
             color: white; /* 로고 텍스트 색상 */
             font-size: 2rem; /* 로고 폰트 크기 */
             font-weight: bold; /* 로고 폰트 굵기 */
+            margin-left: 15px; /* 로고 왼쪽 마진 추가 */
         }
 
         .navbar-toggler-icon {
@@ -44,7 +47,7 @@
         .navbar-nav .nav-link {
             color: white; /* 네비게이션 링크 텍스트 색상 */
             font-size: 1.2rem; /* 네비게이션 링크 폰트 크기 */
-            margin-right: 20px; /* 링크 간격 조정 */
+            margin-left: 15px; /* 링크 왼쪽 마진 추가 */
             transition: color 0.3s; /* 링크 색상 전환 애니메이션 */
         }
 
@@ -89,6 +92,16 @@
             padding: 20px 0; /* Footer 패딩 */
             text-align: center;
         }
+
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .fade-in {
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -120,10 +133,10 @@
         <div class="container px-lg-5">
             <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
                 <div class="m-4 m-lg-5">
-                  <h1 class="display-5 fw-bold" style="color: pink;">Welcome to ShoppingMall</h1>
+                  <h1 class="display-5 fw-bold" style="color: black;">Welcome to ShoppingMall</h1>
                     <p class="fs-4" style="color: black;">Discover the latest fashion trends.</p>
                     <form class="d-grid mt-4" form action="/currency" method="POST">
-                        <button class="btn btn-primary" type="submit">Check Currency</button>
+                        <button class="btn btn-success btn-block pretty-button" type="submit">Check Currency</button>
                     </form>
                 </div>
             </div>

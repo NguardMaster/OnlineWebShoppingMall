@@ -156,31 +156,39 @@
                                     <br />
                                     <p class="card-text">가격: {{ item[2] }}원</p>
                                     <p class="card-text">수량: {{ item[3] }}개</p>
-                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#quantityModal{{ item[0] }}">
+                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#quantityModal{{ item[0] }}" onclick="setProductName('{{ item[1] }}', '{{ item[0] }}')">
                                         구매하기
                                     </button>
                                     <!-- 각 상품에 대한 모달 -->
                                     <div class="modal fade modal-vertical-align" id="quantityModal{{ item[0] }}" tabindex="-1" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true">
                                       <div class="modal-dialog modal-dialog-centered modal-vertical-align" role="document">
                                           <div class="modal-content">
+                                            <form
+                                                action="/dec_data"
+                                                method="post"
+                                                enctype="multipart/form-data"
+                                                >
+
                                               <div class="modal-header">
-                                                  <h5 class="modal-title" id="quantityModalLabel">수량 선택</h5>
+                                                  <h5 class="modal-title" id="quantityModalLabel" name="quantityModalLabel">수량 선택</h5>
                                                   <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                                               </div>
                                               <div class="modal-body text-center">
                                                   <!-- 수량을 선택하는 입력 필드 -->
+                                                  <input type="hidden" name="productname1" id="productname1" value="">
                                                   <span>수량:</span>
                                                   <input type="number" id="quantity{{ item[0] }}" name="quantity" min="1" value="1">
                                                   <span>개</span>
                                               </div>
                                               <div class="modal-footer">
-                                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                                                  <button type="button" class="btn btn-modern btn-danger" data-dismiss="modal">닫기</button>
                                                   {% if item[3] == 0 %}
-                                                      <button type="button" class="btn btn-danger" disabled>재고 없음</button>
+                                                      <button type="button" class="btn btn-modern btn-danger" disabled>재고 없음</button>
                                                   {% else %}
-                                                      <button type="button" class="btn btn-primary">확인</button>
+                                                      <button type="submit" class="btn btn-modern purchase-button">확인</button>
                                                   {% endif %}
                                               </div>
+                                            </form>
                                           </div>
                                       </div>
                                     </div>
@@ -219,5 +227,32 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // 가격에 콤마 추가 함수
+    function addCommasToPrice(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // 페이지가 로드될 때 실행
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // 모든 가격 요소에 콤마 추가
+        var priceElements = document.querySelectorAll('.card-text');
+        priceElements.forEach(function(element) {
+            var priceText = element.textContent;
+            var price = parseInt(priceText.match(/\d+/)[0]); // 가격에서 숫자 추출
+            var formattedPrice = addCommasToPrice(price); // 콤마 추가
+            element.textContent = priceText.replace(/\d+/, formattedPrice); // 가격 업데이트
+        });
+    });
+
+    // 상품 이름 설정 함수
+    function setProductName(productName, itemId) {
+    var modalTitle = document.querySelector('#quantityModal' + itemId + ' .modal-title');
+    modalTitle.textContent = productName; // Set the modal title to the product name
+
+    var productNameInput = document.getElementById('productname1');
+    productNameInput.value = productName; // Set the value of the hidden input field
+}
+</script>
 </body>
 </html>

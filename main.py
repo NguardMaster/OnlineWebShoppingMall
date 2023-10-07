@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, request, jsonify, url_for
+from flask import Flask, render_template, g, request, jsonify, url_for, redirect
 from module.test_module import test_module
 import sqlite3, os, base64
 
@@ -96,6 +96,17 @@ def get_data():
         data.append(item)
     print(data)
     return jsonify(data)
+
+@app.route('/dec_data', methods=['POST'])
+def dec_data():
+    name2 = request.form.get('productname1')
+    count2 = request.form.get('quantity')
+    print(name2, count2)
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count2, name2,))
+        conn.commit()
+    return redirect('/shop')
 
 
 @app.route("/")

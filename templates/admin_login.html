@@ -55,6 +55,7 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <button type="submit" class="btn btn-success btn-block pretty-button">로그인</button>
+                    <button type="button" class="btn btn-danger btn-block " onclick="window.location.href='/'">취소</button>
                 </form>
                 {% if error_message %}
                 <p style="color: red;" class="mt-2">{{ error_message }}</p>
