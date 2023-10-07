@@ -101,11 +101,15 @@ def get_data():
 def dec_data():
     name2 = request.form.get('productname1')
     count2 = request.form.get('quantity')
-    print(name2, count2)
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
-        cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count2, name2,))
-        conn.commit()
+        cursor.execute("SELECT count FROM product WHERE name = ?", (name2,))
+        selected_data = cursor.fetchone()
+
+        if selected_data:
+            if((selected_data[0]-int(count2)) >= 0):
+                cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count2, name2,))
+                conn.commit()
     return redirect('/shop')
 
 

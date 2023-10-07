@@ -146,51 +146,71 @@
                         <div class="col-md-4">
                             <div class="card mb-4 shadow-sm">
                                 <img
-                                        src="{{ item[4] }}"
-                                        class="card-img-top"
-                                        alt="{{ item[1] }}"
-                                        style="height: 220px"
+                                    src="{{ item[4] }}"
+                                    class="card-img-top"
+                                    alt="{{ item[1] }}"
+                                    style="height: 220px"
                                 />
                                 <div class="card-body">
                                     <h2 class="card-title">{{ item[1] }}</h2>
                                     <br />
                                     <p class="card-text">가격: {{ item[2] }}원</p>
                                     <p class="card-text">수량: {{ item[3] }}개</p>
-                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#quantityModal{{ item[0] }}" onclick="setProductName('{{ item[1] }}', '{{ item[0] }}')">
+                                    <!-- 구매하기 버튼 -->
+                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#purchaseModal{{ item[0] }}" onclick="setProductName('{{ item[1] }}', '{{ item[0] }}')">
                                         구매하기
                                     </button>
-                                    <!-- 각 상품에 대한 모달 -->
-                                    <div class="modal fade modal-vertical-align" id="quantityModal{{ item[0] }}" tabindex="-1" role="dialog" aria-labelledby="quantityModalLabel" aria-hidden="true">
-                                      <div class="modal-dialog modal-dialog-centered modal-vertical-align" role="document">
-                                          <div class="modal-content">
-                                            <form
-                                                action="/dec_data"
-                                                method="post"
-                                                enctype="multipart/form-data"
-                                                >
+                                    <!-- 이메일, 이름, 주소, 전화번호 입력 팝업 -->
+                                    <div class="modal fade" id="purchaseModal{{ item[0] }}" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel{{ item[0] }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <form action="/dec_data" method="post" enctype="multipart/form-data">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="purchaseModalLabel{{ item[0] }}">구매 정보 입력</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- 이메일 주소 입력 -->
+                                                        <input type="hidden" name="productname1" id="productname1" value="{{ item[1] }}">
+                                                        
+                                                        <div class="form-group">
+                                                            <label for="email">구매 수량</label>
+                                                            <input type="number" id="quantity{{ item[0] }}" name="quantity" min="1" value="1">
+                                                        </div>
 
-                                              <div class="modal-header">
-                                                  <h5 class="modal-title" id="quantityModalLabel" name="quantityModalLabel">수량 선택</h5>
-                                                  <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                                              </div>
-                                              <div class="modal-body text-center">
-                                                  <!-- 수량을 선택하는 입력 필드 -->
-                                                  <input type="hidden" name="productname1" id="productname1" value="">
-                                                  <span>수량:</span>
-                                                  <input type="number" id="quantity{{ item[0] }}" name="quantity" min="1" value="1">
-                                                  <span>개</span>
-                                              </div>
-                                              <div class="modal-footer">
-                                                  <button type="button" class="btn btn-modern btn-danger" data-dismiss="modal">닫기</button>
-                                                  {% if item[3] == 0 %}
-                                                      <button type="button" class="btn btn-modern btn-danger" disabled>재고 없음</button>
-                                                  {% else %}
-                                                      <button type="submit" class="btn btn-modern purchase-button">확인</button>
-                                                  {% endif %}
-                                              </div>
-                                            </form>
-                                          </div>
-                                      </div>
+                                                        <div class="form-group">
+                                                            <label for="email">이메일 주소</label>
+                                                            <input type="email" class="form-control" id="email" name="email" required>
+                                                        </div>
+                                                        <!-- 이름 입력 -->
+                                                        <div class="form-group">
+                                                            <label for="name">이름</label>
+                                                            <input type="text" class="form-control" id="name" name="name" required>
+                                                        </div>
+                                                        <!-- 집주소 입력 -->
+                                                        <div class="form-group">
+                                                            <label for="address">집주소</label>
+                                                            <input type="text" class="form-control" id="address" name="address" required>
+                                                        </div>
+                                                        <!-- 전화번호 입력 -->
+                                                        <div class="form-group">
+                                                            <label for="phone">전화번호</label>
+                                                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-modern btn-danger" data-dismiss="modal">닫기</button>
+                                                        {% if item[3] == 0 %}
+                                                            <button type="button" class="btn btn-modern btn-danger" disabled>재고 없음</button>
+                                                        {% else %}
+                                                            <button type="submit" class="btn btn-modern purchase-button">확인</button>
+                                                        {% endif %}
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -247,12 +267,12 @@
 
     // 상품 이름 설정 함수
     function setProductName(productName, itemId) {
-    var modalTitle = document.querySelector('#quantityModal' + itemId + ' .modal-title');
-    modalTitle.textContent = productName; // Set the modal title to the product name
+        var modalTitle = document.querySelector('#purchaseModal' + itemId + ' .modal-title');
+        modalTitle.textContent = productName; // Set the modal title to the product name
 
-    var productNameInput = document.getElementById('productname1');
-    productNameInput.value = productName; // Set the value of the hidden input field
-}
+        var productNameInput = document.getElementById('productname1');
+        productNameInput.value = productName; // Set the value of the hidden input field
+    }
 </script>
 </body>
 </html>
