@@ -157,14 +157,14 @@
                                     <p class="card-text">가격: {{ item[2] }}원</p>
                                     <p class="card-text">수량: {{ item[3] }}개</p>
                                     <!-- 구매하기 버튼 -->
-                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#purchaseModal{{ item[0] }}" onclick="setProductName('{{ item[1] }}', '{{ item[0] }}')">
+                                    <button class="btn btn-modern purchase-button" data-toggle="modal" data-target="#purchaseModal{{ item[0] }}" onclick="setProductName('{{ item[1] }}', '{{ item[0] }}', '{{ item[2] }}')">
                                         구매하기
                                     </button>
                                     <!-- 이메일, 이름, 주소, 전화번호 입력 팝업 -->
                                     <div class="modal fade" id="purchaseModal{{ item[0] }}" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel{{ item[0] }}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content">
-                                                <form action="/dec_data" method="post" enctype="multipart/form-data">
+                                                <form id="purchaseForm{{ item[0] }}" action="/dec_data" method="post" enctype="multipart/form-data">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="purchaseModalLabel{{ item[0] }}">구매 정보 입력</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -174,12 +174,32 @@
                                                     <div class="modal-body">
                                                         <!-- 이메일 주소 입력 -->
                                                         <input type="hidden" name="productname1" id="productname1" value="{{ item[1] }}">
-                                                        
+                                                        <input type="hidden" name="price" id="price{{ item[0] }}" value="{{ item[2] }}">
+                                    
+                                                        <!-- "order_id" 생성 및 입력 -->
+                                                        <input type="hidden" name="order_id" id="order_id{{ item[0] }}" value="">
+                                                        <script>
+                                                            // "order_id" 생성 및 할당
+                                                            var order_id = generateRandomOrderId(); // 무작위 문자열 생성 함수 호출
+                                                            document.getElementById("order_id{{ item[0] }}").value = order_id;
+                                                            
+                                                            // 무작위 문자열 생성 함수
+                                                            function generateRandomOrderId() {
+                                                                var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                                                                var orderId = "";
+                                                                for (var i = 0; i < 4; i++) {
+                                                                    var randomIndex = Math.floor(Math.random() * characters.length);
+                                                                    orderId += characters.charAt(randomIndex);
+                                                                }
+                                                                return orderId;
+                                                            }
+                                                        </script>
+                                    
                                                         <div class="form-group">
                                                             <label for="email">구매 수량</label>
                                                             <input type="number" id="quantity{{ item[0] }}" name="quantity" min="1" value="1">
                                                         </div>
-
+                                    
                                                         <div class="form-group">
                                                             <label for="email">이메일 주소</label>
                                                             <input type="email" class="form-control" id="email" name="email" required>
@@ -189,9 +209,9 @@
                                                             <label for="name">이름</label>
                                                             <input type="text" class="form-control" id="name" name="name" required>
                                                         </div>
-                                                        <!-- 집주소 입력 -->
+                                                        <!-- 주소 입력 -->
                                                         <div class="form-group">
-                                                            <label for="address">집주소</label>
+                                                            <label for="address">주소</label>
                                                             <input type="text" class="form-control" id="address" name="address" required>
                                                         </div>
                                                         <!-- 전화번호 입력 -->
@@ -199,7 +219,7 @@
                                                             <label for="phone">전화번호</label>
                                                             <input type="tel" class="form-control" id="phone" name="phone" required>
                                                         </div>
-                                                    </div>
+                                                    </div>                                    
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-modern btn-danger" data-dismiss="modal">닫기</button>
                                                         {% if item[3] == 0 %}
@@ -266,13 +286,52 @@
     });
 
     // 상품 이름 설정 함수
-    function setProductName(productName, itemId) {
-        var modalTitle = document.querySelector('#purchaseModal' + itemId + ' .modal-title');
-        modalTitle.textContent = productName; // Set the modal title to the product name
+    function setProductName(productName, itemId, price) {
+    var modalTitle = document.querySelector('#purchaseModal' + itemId + ' .modal-title');
+    modalTitle.textContent = productName; // Set the modal title to the product name
 
-        var productNameInput = document.getElementById('productname1');
-        productNameInput.value = productName; // Set the value of the hidden input field
+    var productNameInput = document.getElementById('productname1');
+    productNameInput.value = productName; // Set the value of the hidden input field
+
+    var priceInput = document.getElementById('price' + itemId);
+    priceInput.value = price; // Set the value of the hidden price field
+}
+
+    function submitForm(itemId) {
+        // 폼 데이터 가져오기
+        var formData = new FormData(document.getElementById('purchaseForm' + itemId));
+
+        // AJAX를 사용하여 /dec_data 엔드포인트로 데이터 전송
+        $.ajax({
+            url: '/dec_data',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // 성공한 경우 처리
+            },
+            error: function(error) {
+                // 오류 처리
+            }
+        });
+
+        // AJAX를 사용하여 /process_order/<order_id> 엔드포인트로 데이터 전송
+        $.ajax({
+            url: '/process_order/' + itemId,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // 성공한 경우 처리
+            },
+            error: function(error) {
+                // 오류 처리
+            }
+        });
     }
+
 </script>
 </body>
 </html>

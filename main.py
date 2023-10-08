@@ -1,6 +1,13 @@
 from flask import Flask, render_template, g, request, jsonify, url_for, redirect
 from module.test_module import test_module
 import sqlite3, os, base64
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+import random
+import string
+
 
 app = Flask(__name__)
 app.register_blueprint(test_module)
@@ -8,6 +15,7 @@ DATABASE = 'maindata.db'
 UPLOAD_FOLDER = 'static/img_upload_folder'   # 이미지 업로드 폴더 경로로 변경해주세요
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_pyfile('config.py')
+
 
 
 @app.teardown_appcontext
@@ -27,7 +35,6 @@ def create_tables():
             cursor.execute("CREATE TABLE IF NOT EXISTS product (id INTEGER PRIMARY KEY, name TEXT, price INTEGER, count INTEGER, filename TEXT)")
             conn.commit()
 
-# 이미지 업로드 폴더가 없으면 폴더를 생성하는 함수
 def create_upload_folder_if_not_exists():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -100,17 +107,99 @@ def get_data():
 @app.route('/dec_data', methods=['POST'])
 def dec_data():
     name2 = request.form.get('productname1')
-    count2 = request.form.get('quantity')
-    with sqlite3.connect(DATABASE) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT count FROM product WHERE name = ?", (name2,))
-        selected_data = cursor.fetchone()
+    count2 = int(request.form.get('quantity'))
+    buyer_email = request.form['email']  # 구매자 이메일 주소 수집
+    seller_email = 'insanenwk@gmail.com'  # 판매자 이메일 주소 (수정 가능)
+    name = request.form['name']
+    address = request.form['address']
+    phone = request.form['phone']
+    price = int(request.form.get('price'))
+    finalprice = price * count2
+    order_id = request.form['order_id']
+    conn = sqlite3.connect('orderid.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO orders (order_id, product_name, quantity) VALUES (?, ?, ?)', (order_id, name2, count2))
+    conn.commit()
+    conn.close()
 
-        if selected_data:
-            if((selected_data[0]-int(count2)) >= 0):
-                cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count2, name2,))
-                conn.commit()
+    # 이메일 내용 생성
+    subject = "주문 요청이 발송되었습니다."
+    buyer_body = f"성명: {name}님\n주소: {address}\n전화번호: {phone}\n상품 이름: {name2}\n주문 수량: {count2}개\n주문 수량: {price}원\n합계 : {finalprice}원\n정보를 확인하시고 아래 계좌로 {finalprice}원을 입금해 주세요.\n입금자명 : 나원규\n계좌번호 : 123412341234  농협은행\n!주의! : 입금하실 떄 입금자명을 \"{order_id}\" 로 변경하여 입금해주세요.\n주의사항을 따르지 않으시면 결제 및 배송에 지연이 발생할 수 있습니다."
+    seller_body = f"주문자 이름: {name}\n이메일: {buyer_email}\n주소: {address}\n전화번호: {phone}\n상품 이름: {name2}\n주문 수량: {count2}개\n제품 가격 : {price}원\n주문 번호 : {order_id} 합계 : {finalprice}원\n" \
+                f"<a href='{url_for('process_order', order_id=order_id)}'>주문 처리</a>"
+
+    # 이메일 보내기
+    send_email(buyer_email, subject, buyer_body)  # 구매자에게 이메일 전송
+    send_email(seller_email, subject, seller_body)  # 판매자에게 이메일 전송
+
     return redirect('/shop')
+    
+@app.route('/process_order/<order_id>', methods=['GET'])
+def process_order(order_id):
+    # 주문 ID로 DB에서 해당 주문 정보 조회
+    with sqlite3.connect('orderid.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT order_id, product_name, quantity FROM orders WHERE order_id = ?", (order_id,))
+        order_data = cursor.fetchall()
+
+    # 만약 주문 ID가 DB에 없으면 오류 페이지를 표시
+    if not order_data:
+        error_message = '주문을 찾을 수 없습니다.'
+        return render_template('error.html', error_message=error_message)
+
+    # 주문 정보 추출
+    # 주문 정보 추출
+    for order_id1, name1, count1 in order_data:
+        # 상품 재고를 업데이트
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT count FROM product WHERE name = ?", (name1,))
+            selected_data = cursor.fetchone()
+
+            if selected_data:
+                if (selected_data[0] - count1) >= 0:
+                    cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count1, name1,))
+                    conn.commit()
+                    
+                    # 처리가 완료된 order_id를 삭제
+                    with sqlite3.connect('orderid.db') as delete_conn:
+                        delete_cursor = delete_conn.cursor()
+                        delete_cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id1,))
+                        delete_conn.commit()
+                else:
+                    error_message = '상품 재고가 부족합니다.'
+                    return render_template('error.html', error_message=error_message)
+
+    # 주문 처리가 완료되면 어떤 화면을 보여줄지 여기에 구현합니다.
+    return render_template('order_processed.html')
+
+
+def send_email(to_email, subject, body):
+    # Gmail SMTP 서버 설정
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    smtp_username = 'sanenwk@gmail.com'  # Gmail 계정 이메일 주소
+    smtp_password = 'dhihurllpxvhruql'  # Gmail 계정 비밀번호
+
+    # 이메일 메시지 생성
+    msg = MIMEMultipart()
+    msg['From'] = 'Receipt'
+    msg['To'] = to_email  # 받는 사람 이메일 주소
+    msg['Subject'] = subject
+
+    # 이메일 본문 추가
+    msg.attach(MIMEText(body, 'plain'))
+
+    # SMTP 서버 연결 및 이메일 보내기
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.sendmail(smtp_username, to_email, msg.as_string())
+        server.quit()
+        print(f"이메일이 성공적으로 발송하였습니다. (받는 사람: {to_email})")
+    except Exception as e:
+        print(f"이메일 발송에 실패하였습니다. (받는 사람: {to_email}): {str(e)}")
 
 
 @app.route("/")
