@@ -1,4 +1,5 @@
-from flask import Flask, render_template, g, request, jsonify, url_for, redirect
+from flask import Flask, render_template, g, request, jsonify, url_for, redirect, flash, session
+from flask_session import Session
 from module.test_module import test_module
 import sqlite3, os, base64
 import smtplib
@@ -7,7 +8,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import random
 import string
-
+import secrets
+import string
+import hashlib
 
 app = Flask(__name__)
 app.register_blueprint(test_module)
@@ -15,8 +18,9 @@ DATABASE = 'maindata.db'
 UPLOAD_FOLDER = 'static/img_upload_folder'   # 이미지 업로드 폴더 경로로 변경해주세요
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_pyfile('config.py')
-
-
+app.secret_key = 'hellowk09!'
+app.config['SESSION_TYPE'] = 'filesystem'  # 세션을 파일 시스템에 저장
+Session(app)
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -85,6 +89,83 @@ def get_data_from_db():
         rows = cursor.fetchall()
         return rows
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # 비밀번호 안전성 검사 로직을 추가
+        if not is_password_secure(password):
+            flash('비밀번호가 안전성 요건을 충족하지 않습니다. 비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수문자를 혼합해야 합니다.', 'danger')
+            return redirect(url_for('register'))
+        
+        conn = sqlite3.connect('user.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM users WHERE username=?', (username,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            conn.close()
+            flash('이미 사용 중인 사용자 이름입니다. 다른 사용자 이름을 선택해주세요.', 'danger')
+        else:
+            cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+            conn.commit()
+            conn.close()
+
+            flash('회원가입이 완료되었습니다.', 'success')
+            return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+def is_password_secure(password):
+    # 비밀번호의 안전성 검사 로직
+    # 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 혼합해야 함
+    if len(password) < 8:
+        return False
+    if not any(char.isupper() for char in password):
+        return False
+    if not any(char.islower() for char in password):
+        return False
+    if not any(char.isdigit() for char in password):
+        return False
+    if not any(char in string.punctuation for char in password):
+        return False
+    return True
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        conn = sqlite3.connect('user.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password))
+        user = cursor.fetchone()
+
+        conn.close()
+
+        if user:
+            # 세션에 사용자 정보 저장
+            session['username'] = username
+
+            flash('로그인 성공!', 'success')
+            return redirect('/')
+        else:
+            flash('로그인 실패. 사용자 이름 또는 비밀번호가 일치하지 않습니다.', 'danger')
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    # 세션에서 사용자 정보 제거 (로그아웃)
+    session.pop('username', None)
+    flash('로그아웃되었습니다.', 'success')
+    return redirect('/')
+
 @app.route('/get_data', methods=['GET'])
 def get_data():
     # DB에서 데이터를 조회
@@ -125,8 +206,9 @@ def dec_data():
     # 이메일 내용 생성
     subject = "주문 요청이 발송되었습니다."
     buyer_body = f"성명: {name}님\n주소: {address}\n전화번호: {phone}\n상품 이름: {name2}\n주문 수량: {count2}개\n주문 수량: {price}원\n합계 : {finalprice}원\n정보를 확인하시고 아래 계좌로 {finalprice}원을 입금해 주세요.\n입금자명 : 나원규\n계좌번호 : 123412341234  농협은행\n!주의! : 입금하실 떄 입금자명을 \"{order_id}\" 로 변경하여 입금해주세요.\n주의사항을 따르지 않으시면 결제 및 배송에 지연이 발생할 수 있습니다."
-    seller_body = f"주문자 이름: {name}\n이메일: {buyer_email}\n주소: {address}\n전화번호: {phone}\n상품 이름: {name2}\n주문 수량: {count2}개\n제품 가격 : {price}원\n주문 번호 : {order_id} 합계 : {finalprice}원\n" \
-                f"<a href='{url_for('process_order', order_id=order_id)}'>주문 처리</a>"
+    seller_body = f"주문자 이름: {name}<br>이메일: {buyer_email}<br>주소: {address}<br>전화번호: {phone}<br>상품 이름: {name2}<br>주문 수량: {count2}개<br>제품 가격 : {price}원<br>주문 번호 : {order_id}<br>합계 : {finalprice}원<br>" \
+              f"<a href='http://127.0.0.1:8081/process_order/{order_id}' style='display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;'>주문 처리</a>"
+
 
     # 이메일 보내기
     send_email(buyer_email, subject, buyer_body)  # 구매자에게 이메일 전송
@@ -136,43 +218,47 @@ def dec_data():
     
 @app.route('/process_order/<order_id>', methods=['GET'])
 def process_order(order_id):
-    # 주문 ID로 DB에서 해당 주문 정보 조회
-    with sqlite3.connect('orderid.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT order_id, product_name, quantity FROM orders WHERE order_id = ?", (order_id,))
-        order_data = cursor.fetchall()
-
-    # 만약 주문 ID가 DB에 없으면 오류 페이지를 표시
-    if not order_data:
-        error_message = '주문을 찾을 수 없습니다.'
-        return render_template('error.html', error_message=error_message)
-
-    # 주문 정보 추출
-    # 주문 정보 추출
-    for order_id1, name1, count1 in order_data:
-        # 상품 재고를 업데이트
-        with sqlite3.connect(DATABASE) as conn:
+    # 첫 번째로 유저네임이 "Administrator"인지 확인
+    if 'username' in session and session['username'] == 'Administrator':
+        # 주문 ID로 DB에서 해당 주문 정보 조회
+        with sqlite3.connect('orderid.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT count FROM product WHERE name = ?", (name1,))
-            selected_data = cursor.fetchone()
+            cursor.execute("SELECT order_id, product_name, quantity FROM orders WHERE order_id = ?", (order_id,))
+            order_data = cursor.fetchall()
 
-            if selected_data:
-                if (selected_data[0] - count1) >= 0:
-                    cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count1, name1,))
-                    conn.commit()
-                    
-                    # 처리가 완료된 order_id를 삭제
-                    with sqlite3.connect('orderid.db') as delete_conn:
-                        delete_cursor = delete_conn.cursor()
-                        delete_cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id1,))
-                        delete_conn.commit()
-                else:
-                    error_message = '상품 재고가 부족합니다.'
-                    return render_template('error.html', error_message=error_message)
+        # 만약 주문 ID가 DB에 없으면 오류 페이지를 표시
+        if not order_data:
+            error_message = '주문을 찾을 수 없습니다.'
+            return render_template('error.html', error_message=error_message)
 
-    # 주문 처리가 완료되면 어떤 화면을 보여줄지 여기에 구현합니다.
-    return render_template('order_processed.html')
+        # 주문 정보 추출
+        for order_id1, name1, count1 in order_data:
+            # 상품 재고를 업데이트
+            with sqlite3.connect(DATABASE) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT count FROM product WHERE name = ?", (name1,))
+                selected_data = cursor.fetchone()
 
+                if selected_data:
+                    if (selected_data[0] - count1) >= 0:
+                        cursor.execute("UPDATE product SET count = count - ? WHERE name = ?", (count1, name1,))
+                        conn.commit()
+                        
+                        # 처리가 완료된 order_id를 삭제
+                        with sqlite3.connect('orderid.db') as delete_conn:
+                            delete_cursor = delete_conn.cursor()
+                            delete_cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id1,))
+                            delete_conn.commit()
+                    else:
+                        error_message = '상품 재고가 부족합니다.'
+                        return render_template('error.html', error_message=error_message)
+
+        # 주문 처리가 완료되면 어떤 화면을 보여줄지 여기에 구현합니다.
+        return render_template('order_processed.html')
+    else:
+        # 유저네임이 "Administrator"가 아닌 경우 오류 메시지를 표시
+        error_message = '관리자만 접근할 수 있습니다.'
+        return render_template('error.html', error_message=error_message)
 
 def send_email(to_email, subject, body):
     # Gmail SMTP 서버 설정
@@ -188,7 +274,7 @@ def send_email(to_email, subject, body):
     msg['Subject'] = subject
 
     # 이메일 본문 추가
-    msg.attach(MIMEText(body, 'plain'))
+    msg.attach(MIMEText(body, 'html'))
 
     # SMTP 서버 연결 및 이메일 보내기
     try:
@@ -215,19 +301,20 @@ def about():
 
 @app.route("/admin", methods=['GET', 'POST'])
 def adminpanel():
-    if request.method == 'POST':
-        # POST 요청을 처리하여 입력된 비밀번호를 확인
-        password_attempt = request.form.get('password')
-        if password_attempt == app.config['ADMIN_PASSWORD']:
-            # 비밀번호가 일치하는 경우, adminpanel.html 페이지로 이동
-            return render_template('adminpanel.html')
-        else:
-            # 비밀번호가 일치하지 않는 경우 에러 메시지를 표시
-            error_message = '비밀번호가 올바르지 않습니다.'
-            return render_template('admin_login.html', error_message=error_message)
+    # Remove the password check
+    # if request.method == 'POST':
+    #     password_attempt = request.form.get('password')
+    #     if password_attempt == app.config['ADMIN_PASSWORD']:
+    #         return render_template('adminpanel.html')
+    #     else:
+    #         error_message = '비밀번호가 올바르지 않습니다.'
+    #         return render_template('admin_login.html', error_message=error_message)
 
-    # GET 요청인 경우, 로그인 폼을 표시
-    return render_template('admin_login.html')
+    # Check if the user is logged in as Administrator
+    if 'username' in session and session['username'] == 'Administrator':
+        return render_template('adminpanel.html')
+    else:
+        return render_template('error.html', error_message="관리자만 접근할 수 있습니다.")
 
 if __name__ == "__main__":              
     app.run(host="0.0.0.0", port="8081" ,debug=True)

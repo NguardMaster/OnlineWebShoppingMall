@@ -148,7 +148,7 @@
     <div class="container px-lg-5">
         <a class="navbar-brand" href="/">ShoppingMall</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -159,9 +159,24 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/shop">Shop</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin">Admin</a>
-                </li>
+                <!-- 로그인 상태에 따라 다른 내용 표시 -->
+                {% if session['username'] %}
+                    <li class="nav-item">
+                        <span class="nav-link text-white">Welcome, {{ session['username'] }}</span>
+                    </li>
+                    {% if session['username'] == 'Administrator' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Admin</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for the pretty button -->
+    <style>
+        body {
+            background-image: url('background_image.jpg'); /* 배경 이미지 경로 설정 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+        }
+
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.8); /* 회원가입 폼 배경 색상 및 투명도 설정 */
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 50px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .pretty-button {
+            background-color: #4CAF50; /* Green background color */
+            color: white; /* White text color */
+            border: none; /* No border */
+            padding: 10px 20px; /* Padding */
+            text-align: center; /* Center text */
+            text-decoration: none; /* No underlining */
+            display: inline-block; /* Display as inline block */
+            margin: 4px 2px; /* Margin between buttons */
+            cursor: pointer; /* Cursor pointer on hover */
+            border-radius: 8px; /* Rounded corners */
+            transition: background-color 0.3s ease; /* Smooth color transition */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        }
+
+        .pretty-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4 signup-container">
+                <h1 class="text-center">회원가입</h1>
+                <form method="POST" action="/register">
+                    <div class="form-group">
+                        <label for="username">사용자 이름:</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">비밀번호:</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block pretty-button">가입하기</button>
+                </form>
+                <!-- 로그인 및 취소 버튼 추가 -->
+                <div class="text-center mt-3">
+                    <a href="/login" class="btn btn-primary">로그인</a>
+                    <a href="/" class="btn btn-danger">취소</a>
+                </div>
+                <!-- 오류 메시지 표시 -->
+                {% if error_message %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    {{ error_message }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
