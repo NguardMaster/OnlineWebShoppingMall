@@ -205,7 +205,7 @@ def dec_data():
 
     # 이메일 내용 생성
     subject = "주문 요청이 발송되었습니다."
-    buyer_body = f"성명: {name}님\n주소: {address}\n전화번호: {phone}\n상품 이름: {name2}\n주문 수량: {count2}개\n주문 수량: {price}원\n합계 : {finalprice}원\n정보를 확인하시고 아래 계좌로 {finalprice}원을 입금해 주세요.\n입금자명 : 나원규\n계좌번호 : 123412341234  농협은행\n!주의! : 입금하실 떄 입금자명을 \"{order_id}\" 로 변경하여 입금해주세요.\n주의사항을 따르지 않으시면 결제 및 배송에 지연이 발생할 수 있습니다."
+    buyer_body = f"성명: {name}님<br>주소: {address}<br>전화번호: {phone}<br>상품 이름: {name2}<br>주문 수량: {count2}개<br>주문 수량: {price}원<br>합계 : {finalprice}원<br>정보를 확인하시고 아래 계좌로 {finalprice}원을 입금해 주세요.<br>입금주 : 나원규<br>계좌번호 : 123412341234  농협은행<br>!주의! : 입금하실 떄 입금자명을 \"{order_id}\" 로 변경하여 입금해주세요.<br>주의사항을 따르지 않으시면 결제 및 배송에 지연이 발생할 수 있습니다."
     seller_body = f"주문자 이름: {name}<br>이메일: {buyer_email}<br>주소: {address}<br>전화번호: {phone}<br>상품 이름: {name2}<br>주문 수량: {count2}개<br>제품 가격 : {price}원<br>주문 번호 : {order_id}<br>합계 : {finalprice}원<br>" \
               f"<a href='http://127.0.0.1:8081/process_order/{order_id}' style='display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;'>주문 처리</a>"
 

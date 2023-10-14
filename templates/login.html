@@ -43,6 +43,14 @@
             background-color: #45a049; /* Darker green on hover */
         }
     </style>
+<script>
+        // JavaScript 함수를 사용하여 오류 메시지를 표시합니다.
+        function displayErrorMessage(message) {
+            var errorMessageDiv = document.getElementById("error-message");
+            errorMessageDiv.innerHTML = message;
+            errorMessageDiv.style.display = "block";
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -65,12 +73,10 @@
                     <a href="/register" class="btn btn-primary">회원가입</a>
                     <a href="/" class="btn btn-danger">취소</a>
                 </div>
-                <!-- 오류 메시지 표시 -->
-                {% if error_message %}
-                <div class="alert alert-danger mt-3" role="alert">
-                    {{ error_message }}
+                <!-- 오류 메시지 표시를 위한 div 엘리먼트 추가 -->
+                <div id="error-message" class="alert alert-danger mt-3" style="display: none;">
+                    <!-- 오류 메시지는 JavaScript로 업데이트됩니다. -->
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
