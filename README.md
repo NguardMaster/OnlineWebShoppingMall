@@ -16,7 +16,9 @@ pip install flask
 pip install flask_session
 ```
 2. run python
+```
 python3 main.py
-3. visit localhost or your domain
+```
+4. visit localhost or your domain
    
 Thanks
