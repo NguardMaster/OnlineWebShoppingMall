@@ -8,8 +8,13 @@ Button & Resources By Bootstrap
 
 
 Installation
-1. install modules
+1. install modules <br>
+```
 pip install flask
+```
+```
+pip install flask_session
+```
 2. run python
 python3 main.py
 3. visit localhost or your domain
